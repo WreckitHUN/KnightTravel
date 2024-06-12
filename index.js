@@ -1,11 +1,13 @@
+document.addEventListener('dragstart', function(event) {
+  event.preventDefault();
+});
+
 const knightMoves = (start, end) => {
-    let visited = new Set();
-    let queue = [start];
-
+    let _start = convertToDecimals(start);
+    let _end = convertToDecimals(end);
     adjacencyList = createAdjacencyList();
-    
-
-    console.log(bfsPath(adjacencyList, start, end));
+   
+    const shortestPath = (bfsPath(adjacencyList, _start, _end));
 
     function bfsPath(adjacencyList, start, end) {
         let queue = [[start, [start]]]; // Initialize the queue with the start node and path
@@ -14,7 +16,9 @@ const knightMoves = (start, end) => {
         while (queue.length > 0) {
           let [cell, path] = queue.shift(); // Dequeue a node and its path from the queue
       
-          if (cell === end) return path; // If it's the endpoint, return the path
+          if (cell === end) {
+            return path.map((cell) => convertToCoordinates(cell));
+          }; // If it's the endpoint, return the path
       
           adjacencyList[cell].forEach(adjCell => {
             if (!visited.has(adjCell)) { // If the adjacent cell hasn't been visited
@@ -65,10 +69,113 @@ const knightMoves = (start, end) => {
         return [x, y];
     }
 
+    function convertToDecimals([x, y]){
+      return x * 8 + y;
+    }
 
+return shortestPath;
 }
 
-knightMoves(60, 20);
+const updateDOM = () => {
+  createBoard();
+
+  function createBoard(){
+    const container = document.querySelector(".container");
+    // Delete content
+    container.textContent = "";
+    let _start = [];
+    let _end = [];
+    let _clickCount = 0;
+    const board = document.createElement("div");
+    board.classList.add("board");
+    board.classList.add("clickableStart");
+    board.classList.add("clickableEnd");
+    container.appendChild(board);
+
+    // Create a button for the travail
+    const travailButton = document.createElement("button");
+    travailButton.classList.add("btn");
+    travailButton.textContent = "TRAVAIL";
+    container.appendChild(travailButton);
+
+    travailButton.addEventListener("click", () => {
+      if (!_start?.length || !_end?.length) return;
+      let shortestPath = knightMoves(_start, _end);
+      console.log(shortestPath);
+      shortestPath.forEach((coord, i) => {
+        if (i === 0) return;
+        // Mark each cell
+        let cell = document.querySelector(`[data-row="${coord[0]}"][data-column="${coord[1]}"]`);
+        cell.textContent = i;
+        cell.style.background = "green";
+      })
+    })
+
+    // Create resetButton
+    const resetButton = document.createElement("button");
+    resetButton.classList.add("btn");
+    resetButton.textContent = "RESET";
+    container.appendChild(resetButton);
+    resetButton.addEventListener("click", () => {
+      createBoard();
+    });
+
+    for(let i = 0; i < 8; i++){
+      let row = document.createElement("div");
+      row.classList.add("row");
+      for(let j = 0; j < 8; j++){
+        let cell = document.createElement("div");
+        let horsePNG = document.createElement("img");
+        horsePNG.src = "./assets/knight.png";
+        horsePNG.classList.add("horse");
+        cell.appendChild(horsePNG);
+        cell.classList.add("cell");
+        cell.dataset.row = i;
+        cell.dataset.column = j;
+    
+        row.appendChild(cell);
+      }
+      board.appendChild(row);
+    }
+
+    board.addEventListener("click", (e) => {
+      if (_clickCount > 2) return;
+      let target = e.target.classList.contains("horse") ? e.target.parentNode : e.target;
+
+      console.log(target);
+      // firstClick
+      if (_clickCount === 0){
+        // Remove the clickableStart from board
+        board.classList.remove("clickableStart");
+        // Make the click horse visible
+        target.firstChild.style.opacity = 1;
+        // Add clickedStart to the cell
+        target.classList.add("clickedStart");
+        _clickCount++;
+        _start[0] = +target.dataset.row;
+        _start[1] = +target.dataset.column;
+        console.log(_start);
+        return;
+      }
+      // SecondClick
+      if (_clickCount === 1){
+        // Remove the clickableEnd from board
+        board.classList.remove("clickableEnd");
+        // Add clickedEnd to the cell
+        target.classList.add("clickedEnd");
+        _clickCount++;
+        _end[0] = +target.dataset.row;
+        _end[1] = +target.dataset.column;
+        console.log(_end);
+        return;
+      }
+    
+    });
+  }
+}
+
+updateDOM();
+
 
 
 

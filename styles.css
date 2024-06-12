@@ -1,0 +1,72 @@
+body{
+    margin: 0;
+    width: 100%;
+    height: 100svh;
+
+}
+
+img{
+    width: 100%;
+}
+
+.container{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    background: teal;
+    height: 100%;
+}
+
+.board{
+    box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.7);
+}
+
+.row{
+    display: flex;
+}
+
+.cell{
+    font-weight: bold;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1/1;
+    width: 40px;
+}
+
+.row .cell {
+    background: #6c757d
+}
+.row:nth-child(2n) .cell:nth-child(2n),
+.row:nth-child(odd) .cell:nth-child(odd) {
+    background: #f8f9fa;
+}
+
+
+.horse{
+    opacity: 0;
+    width: 30px;
+    height: 30px;
+    transition: all 0.1s;
+}
+
+.clickableStart .cell:hover .horse{
+    opacity: 1;
+}
+
+.board:not(.clickableStart).clickableEnd .cell:not(.clickedStart):hover{
+    background: red;
+}
+
+.cell.clickedEnd{
+    background: red !important;
+}
+
+
+
+
+
+
